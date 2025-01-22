@@ -1,0 +1,1281 @@
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/ReflectiveSurface.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/DamascusSteel.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/SolarCell.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/Asphalt.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/GlossyPaint.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/appearances/protos/FormedConcrete.proto"
+
+WorldInfo {
+  basicTimeStep 50
+}
+Viewpoint {
+  orientation -0.3928941637987134 0.39093582426846707 0.8323480986681255 1.7581984053391255
+  position 0.0008177576677880841 -0.752571406869971 0.9191066166710408
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  floorSize 10 10
+  floorTileSize 1 1
+  floorAppearance FormedConcrete {
+  }
+}
+DEF robot Robot {
+  translation 2.7795787411262648e-05 2.9670274442726935e-05 0.1058337694593393
+  rotation -0.7299363203864084 0.6835150901745587 -0.0002994735634387966 0.0003835070338104505
+  children [
+    DEF imu InertialUnit {
+      name "imu"
+    }
+    DEF frontRightLeg Solid {
+      translation 0.0585 0.1195 0
+      rotation 0 0 -1 0.785398
+      children [
+        DEF r_frontRightLeg Solid {
+          translation 0 -0.027 0
+          children [
+            Shape {
+              appearance GlossyPaint {
+                baseColor 1 0 0
+              }
+              geometry Box {
+                size 0.01 0.01 0.01
+              }
+              castShadows FALSE
+            }
+          ]
+        }
+        DEF r_s1 Pose {
+          translation 0 -0.015 0
+          children [
+            Shape {
+              appearance SolarCell {
+              }
+              geometry Box {
+                size 0.01 0.027 0.01
+              }
+              castShadows FALSE
+            }
+          ]
+        }
+        DEF servo1 HingeJoint {
+          jointParameters HingeJointParameters {
+            position -2.3362579213682834e-07
+            axis 0 0 1
+          }
+          device [
+            RotationalMotor {
+              name "servo16Motor"
+            }
+          ]
+          endPoint Solid {
+            rotation 0 0 -1 2.3276357876976306e-07
+            children [
+              DEF s2 Solid {
+                translation 0 0.044 0
+                rotation 0 -1 0 1.570796327
+                children [
+                  DEF servo2 HingeJoint {
+                    jointParameters HingeJointParameters {
+                      position 5.512837011561852e-08
+                      axis 0 0 -1
+                    }
+                    device [
+                      RotationalMotor {
+                        name "servo17Motor"
+                      }
+                    ]
+                    endPoint Solid {
+                      rotation 0 0 -1 5.16191365590357e-08
+                      children [
+                        DEF s3 Solid {
+                          translation 0 0.075 0
+                          rotation 0 1 0 0.261799388
+                          children [
+                            DEF servo3 HingeJoint {
+                              jointParameters HingeJointParameters {
+                                position -4.6841825370048357e-08
+                                axis 0 0 1
+                              }
+                              device [
+                                RotationalMotor {
+                                  name "servo18Motor"
+                                }
+                              ]
+                              endPoint Solid {
+                                rotation 0 0 -1 4.2146848510894035e-08
+                                children [
+                                  DEF ee_frontRightLeg Solid {
+                                    translation -0.101 0.091 0
+                                    rotation 0 0 1 0.733361849
+                                    children [
+                                      DEF endEffector Shape {
+                                        appearance DamascusSteel {
+                                        }
+                                        geometry Sphere {
+                                          radius 0.005
+                                        }
+                                        castShadows FALSE
+                                      }
+                                    ]
+                                    boundingObject USE endEffector
+                                    physics Physics {
+                                    }
+                                  }
+                                  DEF s3_ee Pose {
+                                    translation -0.0505 0.0455 0
+                                    rotation 0 0 -1 0.733361849
+                                    children [
+                                      DEF s3_eeShape Shape {
+                                        appearance SolarCell {
+                                        }
+                                        geometry Box {
+                                          size 0.13 0.01 0.01
+                                        }
+                                        castShadows FALSE
+                                      }
+                                    ]
+                                  }
+                                ]
+                                boundingObject USE s3_eeShape
+                                physics Physics {
+                                }
+                                linearVelocity 5.03205039291287e-07 -3.0414119950417193e-07 -2.1845535791929444e-07
+                                angularVelocity -2.9793672097593277e-07 1.8024299820377855e-07 -1.4590539464361925e-06
+                              }
+                            }
+                            DEF servo3Shape Shape {
+                              appearance ReflectiveSurface {
+                              }
+                              geometry Cylinder {
+                                height 0.01
+                                radius 0.005
+                              }
+                              castShadows FALSE
+                            }
+                          ]
+                          name "s3"
+                          boundingObject USE servo3Shape
+                          physics Physics {
+                          }
+                        }
+                        DEF s2_s3 Pose {
+                          translation 0 0.0375 0
+                          children [
+                            DEF s2_s3Shape Shape {
+                              appearance SolarCell {
+                              }
+                              geometry Box {
+                                size 0.01 0.07 0.01
+                              }
+                              castShadows FALSE
+                            }
+                          ]
+                        }
+                      ]
+                      boundingObject USE s2_s3Shape
+                      physics Physics {
+                      }
+                      linearVelocity 4.296474754970411e-07 -2.3085169051201646e-07 -1.7046798632416207e-07
+                      angularVelocity -2.980509575936615e-07 1.8039206301454356e-07 -1.4589815350798229e-06
+                    }
+                  }
+                  DEF servo2Shape Shape {
+                    appearance ReflectiveSurface {
+                    }
+                    geometry Cylinder {
+                      height 0.01
+                      radius 0.005
+                    }
+                    castShadows FALSE
+                  }
+                ]
+                boundingObject USE servo2Shape
+                physics Physics {
+                }
+              }
+              DEF servo1Shape Shape {
+                appearance ReflectiveSurface {
+                }
+                geometry Cylinder {
+                  height 0.01
+                  radius 0.005
+                }
+                castShadows FALSE
+              }
+              DEF s1_s2 Pose {
+                translation 0 0.022 0
+                children [
+                  DEF s1_s2Shape Shape {
+                    appearance SolarCell {
+                    }
+                    geometry Box {
+                      size 0.01 0.04 0.01
+                    }
+                    castShadows FALSE
+                  }
+                ]
+              }
+            ]
+            name "solid(1)"
+            boundingObject USE s1_s2Shape
+            physics Physics {
+            }
+            linearVelocity 3.8390653478929455e-07 -1.8510105107356882e-07 -1.1780865326778267e-07
+            angularVelocity -2.9803407014391383e-07 1.804125226750165e-07 -1.4589818546867986e-06
+          }
+        }
+      ]
+      name "solid(2)"
+      boundingObject USE servo1Shape
+      physics Physics {
+      }
+    }
+    DEF middleRightLeg Solid {
+      translation 0.092 0 0
+      rotation 0 0 -1 1.5708
+      children [
+        DEF r Pose {
+          translation 0 -0.027 0
+          children [
+            Shape {
+              appearance GlossyPaint {
+                baseColor 1 0 0
+              }
+              geometry Box {
+                size 0.01 0.01 0.01
+              }
+              castShadows FALSE
+            }
+          ]
+        }
+        DEF r_s1 Pose {
+          translation 0 -0.015 0
+          children [
+            Shape {
+              appearance SolarCell {
+              }
+              geometry Box {
+                size 0.01 0.027 0.01
+              }
+              castShadows FALSE
+            }
+          ]
+        }
+        DEF servo1 HingeJoint {
+          jointParameters HingeJointParameters {
+            position 6.6682865787452e-07
+            axis 0 0 1
+          }
+          device [
+            RotationalMotor {
+              name "servo13Motor"
+            }
+          ]
+          endPoint Solid {
+            rotation 0 0 1 6.670662547826616e-07
+            children [
+              DEF s2 Solid {
+                translation 0 0.044 0
+                rotation 0 -1 0 1.570796327
+                children [
+                  DEF servo2 HingeJoint {
+                    jointParameters HingeJointParameters {
+                      position 3.7743446378322887e-07
+                      axis 0 0 -1
+                    }
+                    device [
+                      RotationalMotor {
+                        name "servo14Motor"
+                      }
+                    ]
+                    endPoint Solid {
+                      rotation 0 0 -1 3.769728732309799e-07
+                      children [
+                        DEF s3 Solid {
+                          translation 0 0.075 0
+                          children [
+                            DEF servo3 HingeJoint {
+                              jointParameters HingeJointParameters {
+                                position -2.2315236299801758e-07
+                                axis 0 0 1
+                              }
+                              device [
+                                RotationalMotor {
+                                  name "servo15Motor"
+                                }
+                              ]
+                              endPoint Solid {
+                                rotation 0 0 -0.9999999999999999 2.2302015940987725e-07
+                                children [
+                                  DEF ee_middleRightLeg Solid {
+                                    translation -0.101 0.091 0
+                                    rotation 0 0 1 0.733361849
+                                    children [
+                                      DEF endEffector Shape {
+                                        appearance DamascusSteel {
+                                        }
+                                        geometry Sphere {
+                                          radius 0.005
+                                        }
+                                        castShadows FALSE
+                                      }
+                                    ]
+                                    boundingObject USE endEffector
+                                    physics Physics {
+                                    }
+                                  }
+                                  DEF s3_ee Pose {
+                                    translation -0.0505 0.0455 0
+                                    rotation 0 0 -1 0.733361849
+                                    children [
+                                      DEF s3_eeShape Shape {
+                                        appearance SolarCell {
+                                        }
+                                        geometry Box {
+                                          size 0.13 0.01 0.01
+                                        }
+                                        castShadows FALSE
+                                      }
+                                    ]
+                                  }
+                                ]
+                                boundingObject USE s3_eeShape
+                                physics Physics {
+                                }
+                                linearVelocity 7.066093488572843e-08 -1.3280786839633956e-07 3.51764223861798e-07
+                                angularVelocity -3.1586880018870933e-07 1.5598377284879504e-07 2.5630906388370013e-06
+                              }
+                            }
+                            DEF servo3Shape Shape {
+                              appearance ReflectiveSurface {
+                              }
+                              geometry Cylinder {
+                                height 0.01
+                                radius 0.005
+                              }
+                              castShadows FALSE
+                            }
+                          ]
+                          boundingObject USE servo3Shape
+                          physics Physics {
+                          }
+                        }
+                        DEF s2_s3 Pose {
+                          translation 0 0.0375 0
+                          children [
+                            DEF s2_s3Shape Shape {
+                              appearance SolarCell {
+                              }
+                              geometry Box {
+                                size 0.01 0.07 0.01
+                              }
+                              castShadows FALSE
+                            }
+                          ]
+                        }
+                      ]
+                      boundingObject USE s2_s3Shape
+                      physics Physics {
+                      }
+                      linearVelocity 9.413409542353577e-08 -2.462313360084828e-07 2.1387293747982644e-07
+                      angularVelocity -3.0869454991669747e-07 1.524037805121303e-07 2.569247736551094e-06
+                    }
+                  }
+                  DEF servo2Shape Shape {
+                    appearance ReflectiveSurface {
+                    }
+                    geometry Cylinder {
+                      height 0.01
+                      radius 0.005
+                    }
+                    castShadows FALSE
+                  }
+                ]
+                boundingObject USE servo2Shape
+                physics Physics {
+                }
+              }
+              DEF servo1Shape Shape {
+                appearance ReflectiveSurface {
+                }
+                geometry Cylinder {
+                  height 0.01
+                  radius 0.005
+                }
+                castShadows FALSE
+              }
+              DEF s1_s2 Pose {
+                translation 0 0.022 0
+                children [
+                  DEF s1_s2Shape Shape {
+                    appearance SolarCell {
+                    }
+                    geometry Box {
+                      size 0.01 0.04 0.01
+                    }
+                    castShadows FALSE
+                  }
+                ]
+              }
+            ]
+            name "solid(1)"
+            boundingObject USE s1_s2Shape
+            physics Physics {
+            }
+            linearVelocity 1.1699945900704737e-07 -2.9295618227522755e-07 8.554079582712677e-08
+            angularVelocity -3.01518838051976e-07 1.488268879232929e-07 2.5804794297037886e-06
+          }
+        }
+      ]
+      name "solid(3)"
+      boundingObject USE servo1Shape
+      physics Physics {
+      }
+    }
+    DEF backRightLeg Solid {
+      translation 0.0585 -0.1195 0
+      rotation 0 0 -1 2.35619449
+      children [
+        DEF r Pose {
+          translation 0 -0.027 0
+          children [
+            Shape {
+              appearance GlossyPaint {
+                baseColor 1 0 0
+              }
+              geometry Box {
+                size 0.01 0.01 0.01
+              }
+              castShadows FALSE
+            }
+          ]
+        }
+        DEF r_s1 Pose {
+          translation 0 -0.015 0
+          children [
+            Shape {
+              appearance SolarCell {
+              }
+              geometry Box {
+                size 0.01 0.027 0.01
+              }
+              castShadows FALSE
+            }
+          ]
+        }
+        DEF servo1 HingeJoint {
+          jointParameters HingeJointParameters {
+            position 7.346603129056465e-07
+            axis 0 0 1
+          }
+          device [
+            RotationalMotor {
+              name "servo10Motor"
+            }
+          ]
+          endPoint Solid {
+            rotation 0 0 1 7.348554137908234e-07
+            children [
+              DEF s2 Solid {
+                translation 0 0.044 0
+                rotation 0 -1 0 1.570796327
+                children [
+                  DEF servo2 HingeJoint {
+                    jointParameters HingeJointParameters {
+                      position 2.432343227257848e-07
+                      axis 0 0 -1
+                    }
+                    device [
+                      RotationalMotor {
+                        name "servo11Motor"
+                      }
+                    ]
+                    endPoint Solid {
+                      rotation 0 0 -1 2.4394252216435837e-07
+                      children [
+                        DEF s3 Solid {
+                          translation 0 0.075 0
+                          children [
+                            DEF servo3 HingeJoint {
+                              jointParameters HingeJointParameters {
+                                position -1.4975571070263608e-07
+                                axis 0 0 1
+                              }
+                              device [
+                                RotationalMotor {
+                                  name "servo12Motor"
+                                }
+                              ]
+                              endPoint Solid {
+                                rotation 0 0 -1 1.490116119384766e-07
+                                children [
+                                  DEF ee_backRightLeg Solid {
+                                    translation -0.101 0.091 0
+                                    rotation 0 0 1 0.733361849
+                                    children [
+                                      DEF endEffector Shape {
+                                        appearance DamascusSteel {
+                                        }
+                                        geometry Sphere {
+                                          radius 0.005
+                                        }
+                                        castShadows FALSE
+                                      }
+                                    ]
+                                    boundingObject USE endEffector
+                                    physics Physics {
+                                    }
+                                  }
+                                  DEF s3_ee Pose {
+                                    translation -0.0505 0.0455 0
+                                    rotation 0 0 -1 0.733361849
+                                    children [
+                                      DEF s3_eeShape Shape {
+                                        appearance SolarCell {
+                                        }
+                                        geometry Box {
+                                          size 0.13 0.01 0.01
+                                        }
+                                        castShadows FALSE
+                                      }
+                                    ]
+                                  }
+                                ]
+                                boundingObject USE s3_eeShape
+                                physics Physics {
+                                }
+                                linearVelocity -1.5305860898686816e-08 -4.448948797340194e-08 2.138504931160585e-07
+                                angularVelocity -2.9734423826994523e-07 1.629110519186936e-07 5.455513339679648e-07
+                              }
+                            }
+                            DEF servo3Shape Shape {
+                              appearance ReflectiveSurface {
+                              }
+                              geometry Cylinder {
+                                height 0.01
+                                radius 0.005
+                              }
+                              castShadows FALSE
+                            }
+                          ]
+                          boundingObject USE servo3Shape
+                          physics Physics {
+                          }
+                        }
+                        DEF s2_s3 Pose {
+                          translation 0 0.0375 0
+                          children [
+                            DEF s2_s3Shape Shape {
+                              appearance SolarCell {
+                              }
+                              geometry Box {
+                                size 0.01 0.07 0.01
+                              }
+                              castShadows FALSE
+                            }
+                          ]
+                        }
+                      ]
+                      boundingObject USE s2_s3Shape
+                      physics Physics {
+                      }
+                      linearVelocity -5.3638967058083174e-08 -9.971088990441817e-08 1.2814785653938677e-07
+                      angularVelocity -3.008891183340575e-07 1.6369955488428213e-07 5.429266269243069e-07
+                    }
+                  }
+                  DEF servo2Shape Shape {
+                    appearance ReflectiveSurface {
+                    }
+                    geometry Cylinder {
+                      height 0.01
+                      radius 0.005
+                    }
+                    castShadows FALSE
+                  }
+                ]
+                boundingObject USE servo2Shape
+                physics Physics {
+                }
+              }
+              DEF servo1Shape Shape {
+                appearance ReflectiveSurface {
+                }
+                geometry Cylinder {
+                  height 0.01
+                  radius 0.005
+                }
+                castShadows FALSE
+              }
+              DEF s1_s2 Pose {
+                translation 0 0.022 0
+                children [
+                  DEF s1_s2Shape Shape {
+                    appearance SolarCell {
+                    }
+                    geometry Box {
+                      size 0.01 0.04 0.01
+                    }
+                    castShadows FALSE
+                  }
+                ]
+              }
+            ]
+            name "solid(1)"
+            boundingObject USE s1_s2Shape
+            physics Physics {
+            }
+            linearVelocity -8.226087666134726e-08 -1.45748033299663e-07 5.8707430586255546e-08
+            angularVelocity -3.044335832106491e-07 1.645010392967736e-07 5.381373639373916e-07
+          }
+        }
+      ]
+      name "solid(4)"
+      boundingObject USE servo1Shape
+      physics Physics {
+      }
+    }
+    DEF frontLeftLeg Solid {
+      translation -0.0585 0.1195 0
+      rotation 0 0 1 0.7853980000000005
+      children [
+        DEF r Pose {
+          translation 0 -0.027 0
+          children [
+            Shape {
+              appearance GlossyPaint {
+                baseColor 1 0 0
+              }
+              geometry Box {
+                size 0.01 0.01 0.01
+              }
+              castShadows FALSE
+            }
+          ]
+        }
+        DEF r_s1 Pose {
+          translation 0 -0.015 0
+          children [
+            Shape {
+              appearance SolarCell {
+              }
+              geometry Box {
+                size 0.01 0.027 0.01
+              }
+              castShadows FALSE
+            }
+          ]
+        }
+        DEF servo1 HingeJoint {
+          jointParameters HingeJointParameters {
+            position 1.1018956808400117e-06
+            axis 0 0 1
+          }
+          device [
+            RotationalMotor {
+              name "servo7Motor"
+            }
+          ]
+          endPoint Solid {
+            rotation 0 0 1 1.1018801657757989e-06
+            children [
+              DEF s2 Solid {
+                translation 0 0.044 0
+                rotation 0 1 0 1.570796327
+                children [
+                  DEF servo2 HingeJoint {
+                    jointParameters HingeJointParameters {
+                      position -3.5777910145640135e-07
+                      axis 0 0 -1
+                    }
+                    device [
+                      RotationalMotor {
+                        name "servo8Motor"
+                      }
+                    ]
+                    endPoint Solid {
+                      rotation 0 0 0.9999999999999999 3.576278686523442e-07
+                      children [
+                        DEF s3 Solid {
+                          translation 0 0.075 0
+                          children [
+                            DEF servo3 HingeJoint {
+                              jointParameters HingeJointParameters {
+                                position 2.1257942223506028e-07
+                                axis 0 0 1
+                              }
+                              device [
+                                RotationalMotor {
+                                  name "servo9Motor"
+                                }
+                              ]
+                              endPoint Solid {
+                                rotation -0.828933274664744 -0.5593475003503064 2.334100887659735e-06 0.09101263139565516
+                                children [
+                                  DEF ee_frontLeftLeg Solid {
+                                    translation 0.101 0.091 0
+                                    rotation 0 0 1 0.733361849
+                                    children [
+                                      DEF endEffector Shape {
+                                        appearance DamascusSteel {
+                                        }
+                                        geometry Sphere {
+                                          radius 0.005
+                                        }
+                                        castShadows FALSE
+                                      }
+                                    ]
+                                    boundingObject USE endEffector
+                                    physics Physics {
+                                    }
+                                  }
+                                  DEF s3_ee Pose {
+                                    translation 0.0505 0.0455 0
+                                    rotation 0 0 1 0.733361849
+                                    children [
+                                      DEF s3_eeShape Shape {
+                                        appearance SolarCell {
+                                        }
+                                        geometry Box {
+                                          size 0.13 0.01 0.01
+                                        }
+                                        castShadows FALSE
+                                      }
+                                    ]
+                                  }
+                                ]
+                                boundingObject USE s3_eeShape
+                                physics Physics {
+                                }
+                                linearVelocity 1.4572827578772615e-07 1.1274131431967155e-07 3.249867755722672e-07
+                                angularVelocity -2.4543021044490344e-07 2.0551279660221853e-07 2.2547660058502655e-06
+                              }
+                            }
+                            DEF servo3Shape Shape {
+                              appearance ReflectiveSurface {
+                              }
+                              geometry Cylinder {
+                                height 0.01
+                                radius 0.005
+                              }
+                              castShadows FALSE
+                            }
+                          ]
+                          boundingObject USE servo3Shape
+                          physics Physics {
+                          }
+                        }
+                        DEF s2_s3 Pose {
+                          translation 0 0.0375 0
+                          children [
+                            DEF s2_s3Shape Shape {
+                              appearance SolarCell {
+                              }
+                              geometry Box {
+                                size 0.01 0.07 0.01
+                              }
+                              castShadows FALSE
+                            }
+                          ]
+                        }
+                      ]
+                      boundingObject USE s2_s3Shape
+                      physics Physics {
+                      }
+                      linearVelocity 2.711218499010939e-07 1.4189370381185725e-07 1.8945038454680552e-07
+                      angularVelocity -2.547755498962661e-07 2.0361511967689796e-07 2.259634923179655e-06
+                    }
+                  }
+                  DEF servo2Shape Shape {
+                    appearance ReflectiveSurface {
+                    }
+                    geometry Cylinder {
+                      height 0.01
+                      radius 0.005
+                    }
+                    castShadows FALSE
+                  }
+                ]
+                boundingObject USE servo2Shape
+                physics Physics {
+                }
+              }
+              DEF servo1Shape Shape {
+                appearance ReflectiveSurface {
+                }
+                geometry Cylinder {
+                  height 0.01
+                  radius 0.005
+                }
+                castShadows FALSE
+              }
+              DEF s1_s2 Pose {
+                translation 0 0.022 0
+                children [
+                  DEF s1_s2Shape Shape {
+                    appearance SolarCell {
+                    }
+                    geometry Box {
+                      size 0.01 0.04 0.01
+                    }
+                    castShadows FALSE
+                  }
+                ]
+              }
+            ]
+            name "solid(1)"
+            boundingObject USE s1_s2Shape
+            physics Physics {
+            }
+            linearVelocity 3.535439676085571e-07 1.2770058811948252e-07 6.705397339725283e-08
+            angularVelocity -2.6414569973939444e-07 2.0167274215719563e-07 2.2684209195237145e-06
+          }
+        }
+      ]
+      name "solid(1)"
+      boundingObject USE servo1Shape
+      physics Physics {
+      }
+    }
+    DEF middleLeftLeg Solid {
+      translation -0.092 0 0
+      rotation 0 0 1 1.570796327
+      children [
+        DEF r Pose {
+          translation 0 -0.027 0
+          children [
+            Shape {
+              appearance GlossyPaint {
+                baseColor 1 0 0
+              }
+              geometry Box {
+                size 0.01 0.01 0.01
+              }
+              castShadows FALSE
+            }
+          ]
+        }
+        DEF r_s1 Pose {
+          translation 0 -0.015 0
+          children [
+            Shape {
+              appearance SolarCell {
+              }
+              geometry Box {
+                size 0.01 0.027 0.01
+              }
+              castShadows FALSE
+            }
+          ]
+        }
+        DEF servo1 HingeJoint {
+          jointParameters HingeJointParameters {
+            position 2.1194787124795867e-07
+            axis 0 0 1
+          }
+          device [
+            RotationalMotor {
+              name "servo4Motor"
+            }
+          ]
+          endPoint Solid {
+            rotation 0 0 1 2.1283115233608642e-07
+            children [
+              DEF s2 Solid {
+                translation 0 0.044 0
+                rotation 0 1 0 1.570796327
+                children [
+                  DEF servo2 HingeJoint {
+                    jointParameters HingeJointParameters {
+                      position -2.2374164912005492e-07
+                      axis 0 0 -1
+                    }
+                    device [
+                      RotationalMotor {
+                        name "servo5Motor"
+                      }
+                    ]
+                    endPoint Solid {
+                      rotation 0 0 1 2.2302015940987725e-07
+                      children [
+                        DEF s3 Solid {
+                          translation 0 0.075 0
+                          children [
+                            DEF servo3 HingeJoint {
+                              jointParameters HingeJointParameters {
+                                position 1.3922326826477635e-07
+                                axis 0 0 1
+                              }
+                              device [
+                                RotationalMotor {
+                                  name "servo6Motor"
+                                }
+                              ]
+                              endPoint Solid {
+                                rotation -0.8289332951818238 -0.5593474699474976 1.5286576218129278e-06 0.0910126313955136
+                                children [
+                                  DEF ee_middleLeftLeg Solid {
+                                    translation 0.101 0.091 0
+                                    rotation 0 0 1 0.733361849
+                                    children [
+                                      DEF endEffector Shape {
+                                        appearance DamascusSteel {
+                                        }
+                                        geometry Sphere {
+                                          radius 0.005
+                                        }
+                                        castShadows FALSE
+                                      }
+                                    ]
+                                    boundingObject USE endEffector
+                                    physics Physics {
+                                    }
+                                  }
+                                  DEF s3_ee Pose {
+                                    translation 0.0505 0.0455 0
+                                    rotation 0 0 1 0.733361849
+                                    children [
+                                      DEF s3_eeShape Shape {
+                                        appearance SolarCell {
+                                        }
+                                        geometry Box {
+                                          size 0.13 0.01 0.01
+                                        }
+                                        castShadows FALSE
+                                      }
+                                    ]
+                                  }
+                                ]
+                                boundingObject USE s3_eeShape
+                                physics Physics {
+                                }
+                                linearVelocity 3.498824377172821e-08 6.021810402781669e-08 1.8637099756977808e-07
+                                angularVelocity -2.987746469896207e-07 2.0578358731608874e-07 2.2632525318449137e-07
+                              }
+                            }
+                            DEF servo3Shape Shape {
+                              appearance ReflectiveSurface {
+                              }
+                              geometry Cylinder {
+                                height 0.01
+                                radius 0.005
+                              }
+                              castShadows FALSE
+                            }
+                          ]
+                          boundingObject USE servo3Shape
+                          physics Physics {
+                          }
+                        }
+                        DEF s2_s3 Pose {
+                          translation 0 0.0375 0
+                          children [
+                            DEF s2_s3Shape Shape {
+                              appearance SolarCell {
+                              }
+                              geometry Box {
+                                size 0.01 0.07 0.01
+                              }
+                              castShadows FALSE
+                            }
+                          ]
+                        }
+                      ]
+                      boundingObject USE s2_s3Shape
+                      physics Physics {
+                      }
+                      linearVelocity 7.047432244387008e-08 8.785398096597229e-08 1.0370016051560981e-07
+                      angularVelocity -2.9750433280108967e-07 2.0170415467714492e-07 2.2543095298976593e-07
+                    }
+                  }
+                  DEF servo2Shape Shape {
+                    appearance ReflectiveSurface {
+                    }
+                    geometry Cylinder {
+                      height 0.01
+                      radius 0.005
+                    }
+                    castShadows FALSE
+                  }
+                ]
+                boundingObject USE servo2Shape
+                physics Physics {
+                }
+              }
+              DEF servo1Shape Shape {
+                appearance ReflectiveSurface {
+                }
+                geometry Cylinder {
+                  height 0.01
+                  radius 0.005
+                }
+                castShadows FALSE
+              }
+              DEF s1_s2 Pose {
+                translation 0 0.022 0
+                children [
+                  DEF s1_s2Shape Shape {
+                    appearance SolarCell {
+                    }
+                    geometry Box {
+                      size 0.01 0.04 0.01
+                    }
+                    castShadows FALSE
+                  }
+                ]
+              }
+            ]
+            name "solid(1)"
+            boundingObject USE s1_s2Shape
+            physics Physics {
+            }
+            linearVelocity 1.0517235594901254e-07 1.0825937741891701e-07 4.0340070162418765e-08
+            angularVelocity -2.962346381865636e-07 1.9762362484316932e-07 2.2374962591026903e-07
+          }
+        }
+      ]
+      name "solid(5)"
+      boundingObject USE servo1Shape
+      physics Physics {
+      }
+    }
+    DEF backLeftLeg Solid {
+      translation -0.0585 -0.1195 0
+      rotation 0 0 1 2.35619449
+      children [
+        DEF r Pose {
+          translation 0 -0.027 0
+          children [
+            Shape {
+              appearance GlossyPaint {
+                baseColor 1 0 0
+              }
+              geometry Box {
+                size 0.01 0.01 0.01
+              }
+              castShadows FALSE
+            }
+          ]
+        }
+        DEF r_s1 Pose {
+          translation 0 -0.015 0
+          children [
+            Shape {
+              appearance SolarCell {
+              }
+              geometry Box {
+                size 0.01 0.027 0.01
+              }
+              castShadows FALSE
+            }
+          ]
+        }
+        DEF servo1 HingeJoint {
+          jointParameters HingeJointParameters {
+            position -9.84833336838572e-09
+            axis 0 0 1
+          }
+          device [
+            RotationalMotor {
+              name "servo1Motor"
+            }
+          ]
+          endPoint Solid {
+            children [
+              DEF s2 Solid {
+                translation 0 0.044 0
+                rotation 0 1 0 1.570796327
+                children [
+                  DEF servo2 HingeJoint {
+                    jointParameters HingeJointParameters {
+                      position -1.647918288249152e-07
+                      axis 0 0 -1
+                    }
+                    device [
+                      RotationalMotor {
+                        name "servo2Motor"
+                      }
+                    ]
+                    endPoint Solid {
+                      rotation 0 0 0.9999999999999999 1.6593230851978133e-07
+                      children [
+                        DEF s3 Solid {
+                          translation 0 0.075 0
+                          children [
+                            DEF servo3 HingeJoint {
+                              jointParameters HingeJointParameters {
+                                position 1.068746491711761e-07
+                                axis 0 0 1
+                              }
+                              device [
+                                RotationalMotor {
+                                  name "servo3Motor"
+                                }
+                              ]
+                              endPoint Solid {
+                                rotation -0.8289333042292805 -0.5593474565403423 1.1734730054136078e-06 0.09101263139547455
+                                children [
+                                  DEF ee_backLeftLeg Solid {
+                                    translation 0.101 0.091 0
+                                    rotation 0 0 1 0.733361849
+                                    children [
+                                      DEF endEffector Shape {
+                                        appearance DamascusSteel {
+                                        }
+                                        geometry Sphere {
+                                          radius 0.005
+                                        }
+                                        castShadows FALSE
+                                      }
+                                    ]
+                                    boundingObject USE endEffector
+                                    physics Physics {
+                                    }
+                                  }
+                                  DEF s3_ee Pose {
+                                    translation 0.0505 0.0455 0
+                                    rotation 0 0 1 0.733361849
+                                    children [
+                                      DEF s3_eeShape Shape {
+                                        appearance SolarCell {
+                                        }
+                                        geometry Box {
+                                          size 0.13 0.01 0.01
+                                        }
+                                        castShadows FALSE
+                                      }
+                                    ]
+                                  }
+                                ]
+                                boundingObject USE s3_eeShape
+                                physics Physics {
+                                }
+                                linearVelocity 6.434529290707349e-09 1.1547498461584269e-08 1.2871451487082145e-07
+                                angularVelocity -3.12333357696361e-07 1.6493896325714138e-07 -7.722953021189223e-07
+                              }
+                            }
+                            DEF servo3Shape Shape {
+                              appearance ReflectiveSurface {
+                              }
+                              geometry Cylinder {
+                                height 0.01
+                                radius 0.005
+                              }
+                              castShadows FALSE
+                            }
+                          ]
+                          boundingObject USE servo3Shape
+                          physics Physics {
+                          }
+                        }
+                        DEF s2_s3 Pose {
+                          translation 0 0.0375 0
+                          children [
+                            DEF s2_s3Shape Shape {
+                              appearance SolarCell {
+                              }
+                              geometry Box {
+                                size 0.01 0.07 0.01
+                              }
+                              castShadows FALSE
+                            }
+                          ]
+                        }
+                      ]
+                      boundingObject USE s2_s3Shape
+                      physics Physics {
+                      }
+                      linearVelocity -1.1049179274296707e-08 1.0092609236774065e-08 7.101492979302509e-08
+                      angularVelocity -3.0869469614194825e-07 1.7135083221121485e-07 -7.783374240639113e-07
+                    }
+                  }
+                  DEF servo2Shape Shape {
+                    appearance ReflectiveSurface {
+                    }
+                    geometry Cylinder {
+                      height 0.01
+                      radius 0.005
+                    }
+                    castShadows FALSE
+                  }
+                ]
+                boundingObject USE servo2Shape
+                physics Physics {
+                }
+              }
+              DEF servo1Shape Shape {
+                appearance ReflectiveSurface {
+                }
+                geometry Cylinder {
+                  height 0.01
+                  radius 0.005
+                }
+                castShadows FALSE
+              }
+              DEF s1_s2 Pose {
+                translation 0 0.022 0
+                children [
+                  DEF s1_s2Shape Shape {
+                    appearance SolarCell {
+                    }
+                    geometry Box {
+                      size 0.01 0.04 0.01
+                    }
+                    castShadows FALSE
+                  }
+                ]
+              }
+            ]
+            name "solid(1)"
+            boundingObject USE s1_s2Shape
+            physics Physics {
+            }
+            linearVelocity -4.35579684853023e-08 2.17275604372952e-08 3.603376592569427e-08
+            angularVelocity -3.050746678276524e-07 1.7778811876506304e-07 -7.89339752249531e-07
+          }
+        }
+      ]
+      name "solid(6)"
+      boundingObject USE servo1Shape
+      physics Physics {
+      }
+    }
+    DEF staticBody Solid {
+      children [
+        DEF mainBody Shape {
+          appearance Asphalt {
+          }
+          geometry Box {
+            size 0.079 0.2 0.01
+          }
+          castShadows FALSE
+        }
+        DEF middleLegOffset Shape {
+          appearance Asphalt {
+          }
+          geometry Box {
+            size 0.129 0.01 0.01
+          }
+          castShadows FALSE
+        }
+      ]
+      boundingObject USE middleLegOffset
+      physics Physics {
+      }
+    }
+  ]
+  boundingObject USE mainBody
+  physics Physics {
+  }
+  controller "poseGatheringController"
+  supervisor TRUE
+  linearVelocity 1.3986821847711748e-07 -6.181261241424204e-08 -2.3541130665112664e-08
+  angularVelocity -2.955412098417362e-07 1.7766616457231818e-07 -1.9799381974911824e-06
+}
