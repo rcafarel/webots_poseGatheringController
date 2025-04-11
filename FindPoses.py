@@ -32,7 +32,7 @@ class FindPoses:
             if command['command'] == 'readGyro':
                 command['subCommands'] = [["readGyro"]]
             elif command['command'] == 'readPosition':
-                command['subCommands'] = [["readPosition"]]
+                command['subCommands'] = [["readPosition", command['message']]]
             elif command['command'] == 'nextPose':
                 command['subCommands'] = [["nextPose", command['message']]]
             elif command['command'] == 'getInitialOrientation':
@@ -142,7 +142,7 @@ class FindPoses:
                         self.moveLeg(leg1, hs['h1'])
 
                         self.raiseOtherInitialSupportingLegs()
-                        self.commands.append({"command": "readPosition", "servoPositions": {}, "time": 0})
+                        self.commands.append({"command": "readPosition", "servoPositions": {}, "time": 0, "message": "S1: " + str(ticks) + ", S2: " + str(ticks2) + ", S3: " + str(ticks3)})
 
                         for h0 in h0Dev:
                             self.moveLeg(leg0, h0)

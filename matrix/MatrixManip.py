@@ -82,6 +82,9 @@ def translateOrientation(R):
 def getMatrix(R):
     return np.array([[R[0], R[1], R[2]],[R[3], R[4], R[5]],[R[6], R[7], R[8]]])
 
+def getMatrix4(R):
+    return np.array([[R[0], R[1], R[2], R[4]], [R[4], R[5], R[6], R[7]], [R[8], R[9], R[10], R[11]], [R[12], R[13], R[14], R[15]]])
+
 def getArray(m):
     return [float(m[0,0]), float(m[0,1]), float(m[0,2]), float(m[1,0]), float(m[1,1]), float(m[1,2]), float(m[2,0]), float(m[2,1]), float(m[2,2])]
 

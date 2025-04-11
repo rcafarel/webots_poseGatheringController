@@ -43,9 +43,14 @@ timestep = int(robot.getBasicTimeStep())
 
 poseDefinition = PoseDefinition(supervisor, controllerRobot, imu)
 
+previousPositions = None
+previousState = None
+
+
 # Main loop:
 # - perform simulation steps until Webots is stopping the controller
 # - or we reach the end of our subcommands
+# print(subCommands)
 while robot.step(timestep) != -1 and commandCounter < len(subCommands):
     subCommand = subCommands[commandCounter]
     commandCounter += 1
@@ -59,22 +64,37 @@ while robot.step(timestep) != -1 and commandCounter < len(subCommands):
         poseDefinition.initializeRobotOrientation()
 
     elif subCommand[0] == 'readPosition':
-        poseDefinition.readPosition()
+        poseDefinition.readPosition(subCommand)
 
     elif subCommand[0] == 'readGyro':
         poseDefinition.readOrientation()
 
     else:  # go to position
+        nextPositions = []
         for i in range(18):
             position = subCommand[i]
             if type(position) == 'float':
                 if servos[i+1] is not None:
                     servos[i+1].setPosition(position)
+                    nextPositions.append(position)
             else:
                 if servos[i+1] is not None:
                     servos[i+1].setPosition(float(position))
+                    nextPositions.append(float(position))
+
+        robot.step(timestep)
+        nextState = poseDefinition.imu.getRollPitchYaw() + poseDefinition.robot_node.getCenterOfMass() + poseDefinition.ee_frontRightLeg.getCenterOfMass()
+        if previousPositions is not None:
+            action = []
+            for i in range(18):
+                action.append(previousPositions[i] - nextPositions[i])
+
+            poseDefinition.inputArray.append(previousState + previousPositions + action)
+            poseDefinition.outputArray.append(nextState + nextPositions)
+
+        previousPositions = nextPositions
+        previousState = nextState
 
 
 poseDefinition.outputPosesForSimulatedAnnealingAlgorithm()
-
 

@@ -1,9 +1,10 @@
+import math
 import time
 
 import numpy as np
 
 from legs.Servo import positionRadiansFromTicks
-from matrix.MatrixManip import matrix2quaternion, getArray, getAxisOfRotation
+from matrix.MatrixManip import matrix2quaternion, getArray, getAxisOfRotation, getMatrix4
 from matrix.Quaternion import Quaternion
 
 
@@ -49,40 +50,87 @@ class PoseDefinition:
         self.output_eey_actual = []
         self.output_eez_actual = []
 
+        self.pRoll = None
+        self.pPitch = None
+
+        self.useRollAndPitch = False
+
+        self.inputArray = []
+        self.outputArray = []
+
     def initializeRobotOrientation(self):
         # read the initial orientation of the robot to make subsequent readings indifferent of initial orientation
         imuq = self.imu.getQuaternion()
         self.rInitO_inverse = np.transpose(Quaternion([imuq[3], imuq[0], imuq[1], imuq[2]]).getR())
-        print("IMU initial O:", self.rInitO_inverse)
+        if self.useRollAndPitch:
+            self.rInitO_inverse = np.transpose(np.eye(3))
+        # print("IMU initial O:", self.rInitO_inverse)
 
-    def readPosition(self):
+    def readPosition(self, subCommand):
         # this is the true orientation of the robot which is recorded prior to calculating the axis of rotation for each pose
         # this is used to calculate the forward kinematics of the robot
         self.imu_O = self.imu.getQuaternion()
+        imuRPY = self.imu.getRollPitchYaw()
 
+        # on the physical system frH_Pos will be calculated
         self.frH_Pos = self.r_frontRightLeg.getCenterOfMass()
+        # frH_O is calculated to remove the affect of the initial orientation of the robot, which should be level
+        # print(Quaternion([self.imu_O[3], self.imu_O[0], self.imu_O[1], self.imu_O[2]]).getR())
+        # print(self.rInitO_inverse)
         self.frH_O = np.matmul(Quaternion([self.imu_O[3], self.imu_O[0], self.imu_O[1], self.imu_O[2]]).getR(), self.rInitO_inverse)
+
+        if self.useRollAndPitch:
+            q = [math.cos(imuRPY[0]/2)*math.cos(imuRPY[1]/2),
+                 math.sin(imuRPY[0]/2)*math.cos(imuRPY[1]/2),
+                 math.cos(imuRPY[0]/2)*math.sin(imuRPY[1]/2),
+                 math.sin(imuRPY[0]/2)*math.sin(imuRPY[1]/2)]
+            self.frH_O = np.matmul(Quaternion(q).getR(), self.rInitO_inverse)
 
         # this reading is only for the simulation, it is used to validate the end effector calculations against actual position
         self.frPos = self.ee_frontRightLeg.getCenterOfMass()
         self.rPos = self.robot_node.getCenterOfMass()
 
+        props = subCommand[1].split(",")
+        s1 = positionRadiansFromTicks(int(props[0].split(":")[1].strip()))
+        s2 = positionRadiansFromTicks(int(props[1].split(":")[1].strip()))
+        s3 = positionRadiansFromTicks(int(props[2].split(":")[1].strip()))
+
+        p_fr = self.getPositionFromRobotNode(self.ee_frontRightLeg)
+        p_ml = self.getPositionFromRobotNode(self.ee_middleLeftLeg)
+        p_br = self.getPositionFromRobotNode(self.ee_backRightLeg)
+        print("Pose FR", p_fr[0], p_fr[1], p_fr[2], s1, s2, s3)
+        print("Pose ML", p_ml[0], p_ml[1], p_ml[2], s1, s2, s3)
+        print("Pose BR", p_br[0], p_br[1], p_br[2], s1, s2, s3)
+
     def readOrientation(self):
         imuq = self.imu.getQuaternion()
+        imuRPY = self.imu.getRollPitchYaw()
         imuO = Quaternion([imuq[3], imuq[0], imuq[1], imuq[2]]).getR()
+
+        if self.useRollAndPitch:
+            q = [math.cos(imuRPY[0]/2)*math.cos(imuRPY[1]/2),
+                 math.sin(imuRPY[0]/2)*math.cos(imuRPY[1]/2),
+                 math.cos(imuRPY[0]/2)*math.sin(imuRPY[1]/2),
+                 math.sin(imuRPY[0]/2)*math.sin(imuRPY[1]/2)]
+            imuO = Quaternion(q).getR()
 
         if self.p_imuO is not None:
             imu_R = np.matmul(np.transpose(self.p_imuO), imuO)
-
             iR = getAxisOfRotation(imu_R)
             slope_i = iR[1]/iR[0]
-            # print("IMU slope: ", slope_i)
+
+            if self.useRollAndPitch:
+                slope_i = (self.pPitch - imuRPY[1]) / (self.pRoll - imuRPY[0])
+
             self.slopeIMU.append(slope_i)
+            # print("IMU slope: ", slope_i)
         self.p_imuO = imuO
+        self.pRoll = imuRPY[0]
+        self.pPitch = imuRPY[1]
 
     def calculatePoseAndInitializeNextPose(self, subCommand):
         # before resetting variables for the next pose, calculate and record pose details
-        print("Pose:", self.poseCounter, subCommand[1])
+        # print("Pose:", self.poseCounter, subCommand[1])
         self.poseCounter += 1
 
         props = subCommand[1].split(",")
@@ -95,7 +143,7 @@ class PoseDefinition:
 
         imuR = np.matmul(Quaternion([self.imu_O[3], self.imu_O[0], self.imu_O[1], self.imu_O[2]]).getR(), self.rInitO_inverse)
         imuq = matrix2quaternion(getArray(imuR))
-        print("imuq:", imuq)
+        # print("imuq:", imuq)
         self.controllerRobot.updateRobotOrientationAndEEs(imuq)
 
         self.printPoseDetails()
@@ -104,22 +152,22 @@ class PoseDefinition:
     def printPoseDetails(self):
         h = 1000*self.frH_Pos[2]
         self.output_h.append(h)
-        print("fr_h:", 1000*self.frH_Pos[0], 1000*self.frH_Pos[1], h)
+        # print("fr_h:", 1000*self.frH_Pos[0], 1000*self.frH_Pos[1], h)
 
         q = matrix2quaternion(getArray(self.frH_O))
         self.output_q0.append(float(q[0]))
         self.output_q1.append(float(q[1]))
         self.output_q2.append(float(q[2]))
         self.output_q3.append(float(q[3]))
-        print("fr_O:", q)
-        print("imu_O:", self.imu_O)
+        # print("fr_O:", q)
+        # print("imu_O:", self.imu_O)
 
         # calculate the average axis of rotation between consecutive readings
         mlSlopeIMU = (self.slopeIMU[6] + self.slopeIMU[7] + self.slopeIMU[8]) / 3
         brSlopeIMU = (self.slopeIMU[1] + self.slopeIMU[2] + self.slopeIMU[3]) / 3
 
-        print("mlSlopeIMU:", mlSlopeIMU)
-        print("brSlopeIMU:", brSlopeIMU)
+        # print("mlSlopeIMU:", mlSlopeIMU)
+        # print("brSlopeIMU:", brSlopeIMU)
 
         # get the positions of the middle left and back right end effectors to calculate the intersection of the axis of rotation
         middleLeftLeg = self.controllerRobot.middleLeftLeg
@@ -133,11 +181,11 @@ class PoseDefinition:
         brY = backRightLeg.footPositionWRTRobotOrientation[1] / 1000.0
         brZ = backRightLeg.footPositionWRTRobotOrientation[2] / 1000.0
 
-        print("rPos", 1000*self.rPos[0], 1000*self.rPos[1], 1000*self.rPos[2])
-
-        print("ml fk:", middleLeftLeg.footPositionWRTRobotOrientation[0], middleLeftLeg.footPositionWRTRobotOrientation[1], middleLeftLeg.footPositionWRTRobotOrientation[2])
-        print("br fk:", backRightLeg.footPositionWRTRobotOrientation[0], backRightLeg.footPositionWRTRobotOrientation[1], backRightLeg.footPositionWRTRobotOrientation[2])
-        print("frPos:", 1000*(self.frPos[0] - self.rPos[0]), 1000*(self.frPos[1] - self.rPos[1]), 1000*(self.frPos[2]))
+        # print("rPos", 1000*self.rPos[0], 1000*self.rPos[1], 1000*self.rPos[2])
+        #
+        # print("ml fk:", middleLeftLeg.footPositionWRTRobotOrientation[0], middleLeftLeg.footPositionWRTRobotOrientation[1], middleLeftLeg.footPositionWRTRobotOrientation[2])
+        # print("br fk:", backRightLeg.footPositionWRTRobotOrientation[0], backRightLeg.footPositionWRTRobotOrientation[1], backRightLeg.footPositionWRTRobotOrientation[2])
+        # print("frPos:", 1000*(self.frPos[0] - self.rPos[0]), 1000*(self.frPos[1] - self.rPos[1]), 1000*(self.frPos[2]))
 
         # calculate intersection point
         num2 = mlSlopeIMU * mlX - mlY - brSlopeIMU * brX + brY
@@ -147,7 +195,7 @@ class PoseDefinition:
 
         # we are determining the proprioception of the leg so we offset the end effector position to where the leg connects to the body (a known poistion)
         hipH = frontRightLeg.hipPositionWRTRobotOrientation
-        print("hipH:", hipH)
+        # print("hipH:", hipH)
 
         x2 = 1000 * frX2 - hipH[0]
         y2 = 1000 * frY2 - hipH[1]
@@ -165,9 +213,26 @@ class PoseDefinition:
         self.output_eey_actual.append(actualY)
         self.output_eez_actual.append(actualZ)
 
-        print("frPos_Calculated:", x2, y2, z2)
-        print("frPos_Actual:", actualX, actualY, actualZ)
-        print("frPos_Diff:", x2 - actualX, y2 - actualY, z2 - actualZ)
+        # print("frPos_Calculated:", x2, y2, z2)
+        # print("frPos_Actual:", actualX, actualY, actualZ)
+        # print("frPos_Diff:", x2 - actualX, y2 - actualY, z2 - actualZ)
+
+    def getPositionFromRobotNode(self, node):
+        H = node.getPose(self.robot_node)  # this is a flattened homogeneous transformation
+        x = H[3]
+        y = H[7]
+        z = H[11]
+        return [x, y, z]
+
+    def getPositionFromRobotNode_relative(self, node):
+        imu_O = Quaternion(self.imu.getQuaternion())
+        H = node.getPose(self.robot_node)  # this is a flattened homogeneous
+        H = np.matmul(np.transpose(imu_O.matrix), [H[3], H[7], H[11], 1])
+        x = H[0]
+        y = H[1]
+        z = H[2]
+
+        return [x, y, z]
 
     def outputPosesForSimulatedAnnealingAlgorithm(self):
         # after all poses have been calculated output the data to be consumed by the simulated annealing algorithm
@@ -183,9 +248,22 @@ class PoseDefinition:
         print("y = ", self.output_eey)
         print("z = ", self.output_eez)
 
+        print("x = ", self.output_eex)
+        print("y = ", self.output_eey)
+        print("z = ", self.output_eez)
+
+        print("")
+        print("")
+        print("")
+
         print("x_actual = ", self.output_eex_actual)
         print("y_actual = ", self.output_eey_actual)
         print("z_actual = ", self.output_eez_actual)
 
         print(time.strftime("%H:%M:%S", time.localtime()))
+
+        print("INPUT ARRAY")
+        print(self.inputArray)
+        print("OUTPUT ARRAY")
+        print(self.outputArray)
 

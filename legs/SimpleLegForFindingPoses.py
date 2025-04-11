@@ -11,7 +11,7 @@ class SimpleLegForFindingPoses:
     def calculateFootPosition(self):
         eeH = self.inverseKinematicChain.forward_kinematics(self.currentJointAngles)
         self.footPosition = [eeH[0][3], eeH[1][3], eeH[2][3]]
-        print("Leg:", self.id, "Foot position:", eeH[0][3], eeH[1][3], eeH[2][3])
+        # print("Leg:", self.id, "Foot position:", eeH[0][3], eeH[1][3], eeH[2][3])
 
 
     def calculateFootPositionWRTRobotOrientation(self, q):
