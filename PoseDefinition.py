@@ -58,6 +58,10 @@ class PoseDefinition:
         self.inputArray = []
         self.outputArray = []
 
+        self.p_fr = None
+        self.p_ml = None
+        self.p_br = None
+
     def initializeRobotOrientation(self):
         # read the initial orientation of the robot to make subsequent readings indifferent of initial orientation
         imuq = self.imu.getQuaternion()
@@ -95,12 +99,12 @@ class PoseDefinition:
         s2 = positionRadiansFromTicks(int(props[1].split(":")[1].strip()))
         s3 = positionRadiansFromTicks(int(props[2].split(":")[1].strip()))
 
-        p_fr = self.getPositionFromRobotNode(self.ee_frontRightLeg)
-        p_ml = self.getPositionFromRobotNode(self.ee_middleLeftLeg)
-        p_br = self.getPositionFromRobotNode(self.ee_backRightLeg)
-        print("Pose FR", p_fr[0], p_fr[1], p_fr[2], s1, s2, s3)
-        print("Pose ML", p_ml[0], p_ml[1], p_ml[2], s1, s2, s3)
-        print("Pose BR", p_br[0], p_br[1], p_br[2], s1, s2, s3)
+        self.p_fr = self.getPositionFromRobotNode(self.ee_frontRightLeg)
+        self.p_ml = self.getPositionFromRobotNode(self.ee_middleLeftLeg)
+        self.p_br = self.getPositionFromRobotNode(self.ee_backRightLeg)
+        print("Pose FR", self.p_fr[0], self.p_fr[1], self.p_fr[2], s1, s2, s3)
+        print("Pose ML", self.p_ml[0], self.p_ml[1], self.p_ml[2], s1, s2, s3)
+        print("Pose BR", self.p_br[0], self.p_br[1], self.p_br[2], s1, s2, s3)
 
     def readOrientation(self):
         imuq = self.imu.getQuaternion()
@@ -166,8 +170,8 @@ class PoseDefinition:
         mlSlopeIMU = (self.slopeIMU[6] + self.slopeIMU[7] + self.slopeIMU[8]) / 3
         brSlopeIMU = (self.slopeIMU[1] + self.slopeIMU[2] + self.slopeIMU[3]) / 3
 
-        # print("mlSlopeIMU:", mlSlopeIMU)
-        # print("brSlopeIMU:", brSlopeIMU)
+        print("mlSlopeIMU:", mlSlopeIMU)
+        print("brSlopeIMU:", brSlopeIMU)
 
         # get the positions of the middle left and back right end effectors to calculate the intersection of the axis of rotation
         middleLeftLeg = self.controllerRobot.middleLeftLeg
@@ -182,10 +186,20 @@ class PoseDefinition:
         brZ = backRightLeg.footPositionWRTRobotOrientation[2] / 1000.0
 
         # print("rPos", 1000*self.rPos[0], 1000*self.rPos[1], 1000*self.rPos[2])
-        #
-        # print("ml fk:", middleLeftLeg.footPositionWRTRobotOrientation[0], middleLeftLeg.footPositionWRTRobotOrientation[1], middleLeftLeg.footPositionWRTRobotOrientation[2])
-        # print("br fk:", backRightLeg.footPositionWRTRobotOrientation[0], backRightLeg.footPositionWRTRobotOrientation[1], backRightLeg.footPositionWRTRobotOrientation[2])
-        # print("frPos:", 1000*(self.frPos[0] - self.rPos[0]), 1000*(self.frPos[1] - self.rPos[1]), 1000*(self.frPos[2]))
+
+        RT = np.transpose(Quaternion(None, self.pRoll, self.pPitch, 0).getR())
+
+        print("ml fk:", middleLeftLeg.footPositionWRTRobotOrientation[0], middleLeftLeg.footPositionWRTRobotOrientation[1], middleLeftLeg.footPositionWRTRobotOrientation[2])
+        print("ml rel", 1000*self.p_ml[0], 1000*self.p_ml[1], 1000*self.p_ml[2])
+        print(np.matmul(RT, [1000*self.p_ml[0], 1000*self.p_ml[1], 1000*self.p_ml[2]]))
+        print("br fk:", backRightLeg.footPositionWRTRobotOrientation[0], backRightLeg.footPositionWRTRobotOrientation[1], backRightLeg.footPositionWRTRobotOrientation[2])
+        print("br rel", 1000*self.p_br[0], 1000*self.p_br[1], 1000*self.p_br[2])
+        print(np.matmul(RT, [1000*self.p_br[0], 1000*self.p_br[1], 1000*self.p_br[2]]))
+        print("frPos:", 1000*(self.frPos[0] - self.rPos[0]), 1000*(self.frPos[1] - self.rPos[1]), 1000*(self.frPos[2]))
+        print("fr rel", 1000*self.p_fr[0], 1000*self.p_fr[1], 1000*self.p_fr[2])
+        print(np.matmul(RT, [1000*self.p_fr[0], 1000*self.p_fr[1], 1000*self.p_fr[2]]))
+
+
 
         # calculate intersection point
         num2 = mlSlopeIMU * mlX - mlY - brSlopeIMU * brX + brY
