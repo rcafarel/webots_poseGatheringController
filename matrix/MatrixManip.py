@@ -89,6 +89,11 @@ def getArray(m):
     return [float(m[0,0]), float(m[0,1]), float(m[0,2]), float(m[1,0]), float(m[1,1]), float(m[1,2]), float(m[2,0]), float(m[2,1]), float(m[2,2])]
 
 def getAxisOfRotation(m):
+    theta = np.arccos((float(m[0, 0]) + float(m[1, 1]) + float(m[2, 2]) - 1.0) / 2.0)
+    v_scalar = 1.0 / 2.0 / np.sin(theta)
+    v_vector = [m[2, 1] - m[1, 2], m[0, 2] - m[2, 0], m[1, 0] - m[0, 1]]
+    slope = v_vector[1] / v_vector[0]
+
     diff_10_01 = (float(m[1,0]) - float(m[0,1]))
     diff_02_20 = (float(m[0,2]) - float(m[2,0]))
     diff_21_12 = (float(m[2,1]) - float(m[1,2]))

@@ -4,7 +4,7 @@ import time
 import numpy as np
 
 from legs.Servo import positionRadiansFromTicks
-from matrix.MatrixManip import matrix2quaternion, getArray, getAxisOfRotation, getMatrix4
+from matrix.MatrixManip import matrix2quaternion, getArray, getAxisOfRotation
 from matrix.Quaternion import Quaternion
 
 
@@ -105,6 +105,9 @@ class PoseDefinition:
         print("Pose FR", self.p_fr[0], self.p_fr[1], self.p_fr[2], s1, s2, s3)
         print("Pose ML", self.p_ml[0], self.p_ml[1], self.p_ml[2], s1, s2, s3)
         print("Pose BR", self.p_br[0], self.p_br[1], self.p_br[2], s1, s2, s3)
+        print("Pose Robot", self.rPos[0], self.rPos[1], self.rPos[2])
+        print("FR CoM", self.frPos[0], self.frPos[1], self.frPos[2])
+        print("IMU:", imuRPY)
 
     def readOrientation(self):
         imuq = self.imu.getQuaternion()
@@ -127,14 +130,14 @@ class PoseDefinition:
                 slope_i = (self.pPitch - imuRPY[1]) / (self.pRoll - imuRPY[0])
 
             self.slopeIMU.append(slope_i)
-            # print("IMU slope: ", slope_i)
+            print("IMU slope: ", slope_i)
         self.p_imuO = imuO
         self.pRoll = imuRPY[0]
         self.pPitch = imuRPY[1]
 
     def calculatePoseAndInitializeNextPose(self, subCommand):
         # before resetting variables for the next pose, calculate and record pose details
-        # print("Pose:", self.poseCounter, subCommand[1])
+        print("Pose Command:", self.poseCounter, subCommand[1])
         self.poseCounter += 1
 
         props = subCommand[1].split(",")
@@ -190,14 +193,15 @@ class PoseDefinition:
         RT = np.transpose(Quaternion(None, self.pRoll, self.pPitch, 0).getR())
 
         print("ml fk:", middleLeftLeg.footPositionWRTRobotOrientation[0], middleLeftLeg.footPositionWRTRobotOrientation[1], middleLeftLeg.footPositionWRTRobotOrientation[2])
-        print("ml rel", 1000*self.p_ml[0], 1000*self.p_ml[1], 1000*self.p_ml[2])
-        print(np.matmul(RT, [1000*self.p_ml[0], 1000*self.p_ml[1], 1000*self.p_ml[2]]))
+        print("ml rel to robot", 1000*self.p_ml[0], 1000*self.p_ml[1], 1000*self.p_ml[2])
+        print("ml global", np.matmul(RT, [1000*self.p_ml[0], 1000*self.p_ml[1], 1000*self.p_ml[2]]))
         print("br fk:", backRightLeg.footPositionWRTRobotOrientation[0], backRightLeg.footPositionWRTRobotOrientation[1], backRightLeg.footPositionWRTRobotOrientation[2])
-        print("br rel", 1000*self.p_br[0], 1000*self.p_br[1], 1000*self.p_br[2])
-        print(np.matmul(RT, [1000*self.p_br[0], 1000*self.p_br[1], 1000*self.p_br[2]]))
-        print("frPos:", 1000*(self.frPos[0] - self.rPos[0]), 1000*(self.frPos[1] - self.rPos[1]), 1000*(self.frPos[2]))
-        print("fr rel", 1000*self.p_fr[0], 1000*self.p_fr[1], 1000*self.p_fr[2])
-        print(np.matmul(RT, [1000*self.p_fr[0], 1000*self.p_fr[1], 1000*self.p_fr[2]]))
+        print("br rel to robot", 1000*self.p_br[0], 1000*self.p_br[1], 1000*self.p_br[2])
+        print("br global", np.matmul(RT, [1000*self.p_br[0], 1000*self.p_br[1], 1000*self.p_br[2]]))
+        # print("frPos:", 1000*(self.frPos[0] - self.rPos[0]), 1000*(self.frPos[1] - self.rPos[1]), 1000*(self.frPos[2]))
+        print("fr fk::", frontRightLeg.footPositionWRTRobotOrientation[0], frontRightLeg.footPositionWRTRobotOrientation[1], frontRightLeg.footPositionWRTRobotOrientation[2])
+        print("fr rel to robot", 1000*self.p_fr[0], 1000*self.p_fr[1], 1000*self.p_fr[2])
+        print("fr global", np.matmul(RT, [1000*self.p_fr[0], 1000*self.p_fr[1], 1000*self.p_fr[2]]))
 
 
 

@@ -3,9 +3,14 @@ import time
 
 class FindPoses:
 
-    def __init__(self, robot, injuredLeg):
+    def __init__(self, robot, injuredLeg, physicalRobot):
         print("Start Gathering Poses")
         self.printTime()
+
+        self.physicalRobot = physicalRobot
+        self.commandFrequency = 0.05
+        if physicalRobot:
+            self.commandFrequency = 0.5
 
         self.robot = robot
         self.injuredLeg = injuredLeg
@@ -27,19 +32,23 @@ class FindPoses:
         self.printTime()
 
     def breakDownCommandsIntoSubCommands(self):
-        previousCommand = None
-        for command in self.commands:
-            if command['command'] == 'readGyro':
-                command['subCommands'] = [["readGyro"]]
-            elif command['command'] == 'readPosition':
-                command['subCommands'] = [["readPosition", command['message']]]
-            elif command['command'] == 'nextPose':
-                command['subCommands'] = [["nextPose", command['message']]]
-            elif command['command'] == 'getInitialOrientation':
-                command['subCommands'] = [["getInitialOrientation"]]
-            else:
-                command['subCommands'] = self.makeSubCommands(command, previousCommand)
-                previousCommand = command
+        filename = 'C:\\Projects\\robot\\webots\\SingleLeg\\controllers\\poseGatheringController\\frontRightLegInjury_FindPoses_subCommands2.txt'
+        with open(filename, "w") as file:
+            previousCommand = None
+            for command in self.commands:
+                if command['command'] == 'readGyro':
+                    command['subCommands'] = [["readGyro"]]
+                elif command['command'] == 'readPosition':
+                    command['subCommands'] = [["readPosition", command['message']]]
+                elif command['command'] == 'nextPose':
+                    command['subCommands'] = [["nextPose", command['message']]]
+                elif command['command'] == 'getInitialOrientation':
+                    command['subCommands'] = [["getInitialOrientation"]]
+                else:
+                    command['subCommands'] = self.makeSubCommands(command, previousCommand)
+                    file.write(",".join(map(str, command['subCommands'][0])))
+                    file.write("\n")
+                    previousCommand = command
 
         # map the subcommands from each command from the digital twin into an array of subcommands
         for i in range(len(self.commands)):
@@ -52,15 +61,15 @@ class FindPoses:
         if previousCommand == None:
             positions = []
             for i in range(18):
-                positions.append(command['servoPositions'][i+1])
+                positions.append(float(command['servoPositions'][i+1]))
             return [positions]
 
         previousPositions = []
         positionDiffs = []
-        numberOfIntervals = command['time'] / 0.05
+        numberOfIntervals = command['time'] / self.commandFrequency
         for i in range(18):
-            previousPositions.append(previousCommand['servoPositions'][i+1])
-            positionDiffs.append((command['servoPositions'][i+1] - previousCommand['servoPositions'][i+1]) / numberOfIntervals)
+            previousPositions.append(float(previousCommand['servoPositions'][i+1]))
+            positionDiffs.append(float((command['servoPositions'][i+1] - previousCommand['servoPositions'][i+1]) / numberOfIntervals))
 
         subCommands = [previousPositions]
 
@@ -131,6 +140,7 @@ class FindPoses:
                 currentServo2.goToTicks(ticks2, 0.5)
 
                 for ticks3 in [ticks2, ticks2+50, ticks2+100]:
+                # for ticks3 in [ticks2, ticks2+50]:
                     currentServo3.goToTicks(ticks3, 0.5)
 
                     for hs in [{'h0': -80, 'h1': -100}, {'h0': -100, 'h1': -80}]:
@@ -141,11 +151,16 @@ class FindPoses:
                         self.moveLeg(leg0, hs['h0'])
                         self.moveLeg(leg1, hs['h1'])
 
-                        self.raiseOtherInitialSupportingLegs()
+                        if not self.physicalRobot:
+                            self.raiseOtherInitialSupportingLegs()
+
                         self.commands.append({"command": "readPosition", "servoPositions": {}, "time": 0, "message": "S1: " + str(ticks) + ", S2: " + str(ticks2) + ", S3: " + str(ticks3)})
 
                         for h0 in h0Dev:
                             self.moveLeg(leg0, h0)
+                            if self.physicalRobot:
+                                self.raiseOtherInitialSupportingLegs()
+                                self.lowerOtherInitialSupportingLegs()
                             self.commands.append({"command": "readGyro", "servoPositions": {}, "time": 0})
 
                         self.moveLeg(leg0, hs['h0'])
@@ -153,9 +168,13 @@ class FindPoses:
 
                         for h1 in h1Dev:
                             self.moveLeg(leg1, h1)
+                            if self.physicalRobot:
+                                self.raiseOtherInitialSupportingLegs()
+                                self.lowerOtherInitialSupportingLegs()
                             self.commands.append({"command": "readGyro", "servoPositions": {}, "time": 0})
 
-                        self.lowerOtherInitialSupportingLegs()
+                        if not self.physicalRobot:
+                            self.lowerOtherInitialSupportingLegs()
 
                         self.commands.append({"command": "nextPose", "servoPositions": {}, "time": 0, "message": "BR: " + str(hs['h1']) + ", ML: " + str(hs['h0']) + ", S1: " + str(ticks) + ", S2: " + str(ticks2) + ", S3: " + str(ticks3)})
 

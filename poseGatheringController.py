@@ -33,7 +33,7 @@ supervisor = Supervisor()
 # print(injuredLegSegment.getRotation())
 # injuredLegSegment.setRotation(0, frontRightLeg_segment3_twistAngle, 0)
 
-findPoses = FindPoses(controllerRobot, injuredLeg)
+findPoses = FindPoses(controllerRobot, injuredLeg, False)
 subCommands = findPoses.subCommands
 
 commandCounter = 0
@@ -65,6 +65,7 @@ while robot.step(timestep) != -1 and commandCounter < len(subCommands):
 
     elif subCommand[0] == 'readPosition':
         poseDefinition.readPosition(subCommand)
+        print(previousPositions)
 
     elif subCommand[0] == 'readGyro':
         poseDefinition.readOrientation()
